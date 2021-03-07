@@ -34,7 +34,7 @@ class MysqlClient(object):
         :param proxy: 代理字典
         :return:
         """
-        sql = 'INSERT INTO `proxy_pool` (`scheme`,`ip`,`port`,`status`,`response_time`,`create_date`) VALUES (%(scheme)s, %(ip)s, %(port)s, %(status)s, %(response_time)s, now())'
+        sql = 'INSERT INTO `spider_proxy_pool` (`scheme`,`ip`,`port`,`status`,`response_time`,`create_date`) VALUES (%(scheme)s, %(ip)s, %(port)s, %(status)s, %(response_time)s, now())'
         data = {
             "scheme": proxy['scheme'],
             "ip": proxy['ip'],
@@ -50,7 +50,7 @@ class MysqlClient(object):
         获取所有可用代理
         :return:
         """
-        sql = 'SELECT `scheme`,`ip`,`port`,`id` FROM proxy_pool WHERE status = "1" ORDER BY update_date ASC '
+        sql = 'SELECT `scheme`,`ip`,`port`,`id` FROM spider_proxy_pool WHERE status = "1" ORDER BY update_date ASC '
         cursor = self.conn.cursor()
         cursor.execute(sql)
         res = cursor.fetchall()
@@ -64,7 +64,7 @@ class MysqlClient(object):
         :param proxy: 需要更新的代理
         :return:
         """
-        sql = 'UPDATE proxy_pool SET scheme = %(scheme)s, ip = %(ip)s, port = %(port)s, status = %(status)s, response_time = %(response_time)s, update_date = now()  WHERE id = %(id)s '
+        sql = 'UPDATE spider_proxy_pool SET scheme = %(scheme)s, ip = %(ip)s, port = %(port)s, status = %(status)s, response_time = %(response_time)s, update_date = now()  WHERE id = %(id)s '
         data = {
             "id": proxy['id'],
             "scheme": proxy['scheme'],
@@ -75,3 +75,29 @@ class MysqlClient(object):
         }
         self.conn.cursor().execute(sql, data)
         self.conn.commit()
+    def add_sys_area(self, area):
+        """
+        新增代理
+        :param proxy: 代理字典
+        :return:
+        """
+        sql = 'INSERT INTO `sys_area` (`AREA_CODE`,`AREA_NAME`,`CREATE_DATE`) VALUES (%(areaCode)s, %(areaName)s, now())'
+        data = {
+            "areaCode": area['areaCode'],
+            "areaName": area['areaName'],
+        }
+        self.conn.cursor().execute(sql, data)
+        self.conn.commit()
+    def find_sys_area_all(self,arealevel):
+        """
+        获取所有可用代理
+        :return:
+        """
+        sql = 'SELECT `AREA_CODE` FROM sys_area WHERE AREA_LEVEL = "{}"  '
+        sql = sql.format(arealevel)
+        cursor = self.conn.cursor()
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        cursor.close()
+        self.conn.commit()
+        return res

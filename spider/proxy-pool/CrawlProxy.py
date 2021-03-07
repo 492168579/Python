@@ -82,4 +82,4 @@ class CrawlProxy(object):
 
 
 if __name__ == '__main__':
-    CrawlProxy().crawl_nimadaili()
+    CrawlProxy().crawl_ip3366()
