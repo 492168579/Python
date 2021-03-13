@@ -4,10 +4,11 @@ import time
 import requests, re, random, os
 from bs4 import BeautifulSoup
 from MysqlClient import MysqlClient
+import json
 
 class PictureSpider(object):
     def __init__(self):
-        self.mysql = MysqlClient()
+        print("")
 
     # 越多越好
     UserAgent_List = [
@@ -40,66 +41,57 @@ class PictureSpider(object):
                }
     # 定义存储位置
     global save_path
-    save_path = 'D:\BeautifulPictures\\'
+    save_path = 'D:\BeautifulPictures1\\'
 
-
-
-    def load_ip(self):
-        ip_list = []
-        items = self.mysql.find_all()
-        for ip in items:
-            ip_list.append(ip[1]+":"+ip[2])
-        return ip_list
-    # 随机获取一个IP
-    def get_random_ip(self,total_ip):
-        print(len(total_ip)-1)
-        idx = random.randint(0, len(total_ip)-1)
-        print(idx)
-        return total_ip[idx]
     # 创建文件夹
     def createFile(self,file_path):
         if os.path.exists(file_path) is False:
             os.makedirs(file_path)
         # 切换路径至上面创建的文件夹
         os.chdir(file_path)
-    def main(self,url,ip_list):
-        proxy = self.get_random_ip(ip_list)
-        proxies = {
-            'http': 'http://{}'.format(proxy)
-        }
-        request = requests.get(url,proxies=proxies,headers=headers)
-        request.encoding = 'gb2312'
+    def main(self,url,num):
+        request = requests.get(url,headers=headers)
+        request.encoding = 'utf-8'
         print("网页内容："+request.text)
         soup_sub = BeautifulSoup(request.text, 'html.parser')
-        # 获取页面的栏目地址
-        img_list  = soup_sub.find('ul', {'class': 'clearfix'}).findAll('img')
+        title = soup_sub.h1.string
+        # 调用后台接口获取图片地址
+        now = int(round(time.time() * 1000))
+        download_url ='http://www.tpxl.com/datacache/pic_'+str(num)+'.js?callback=success_jsonpCallback'+str(num)+'&_='+str(now)
+        download_request = requests.get(download_url, headers=headers)
+        download_request.encoding = 'utf-8'
+        replace = 'success_jsonpCallback'+str(num)+'('
+        data = download_request.text.replace(replace,'').replace(')','')
+        url_list = json.loads(data)
         print("-----------------------------------------")
-        for img in img_list:
-            img_url = img.attrs['src']  # 单个图片的真实地址
-            img_title = img.attrs['alt']  # 单个图片的名字，通过分割url得到
-            self.download(self,img_url,img_title);
-    def download(self,img_url,img_title):
-        print('开始保存图片', img_title,img_url)
-        img_url = "http://pic.netbian.com/"+img_url
-        print("doloadUrl:", img_url,img_title)
+        for item in url_list:
+            url = str(item['url'])
+            print(url)
+            self.download(url,title);
+    def download(self,img_url,title):
+        print('开始保存图片', title,img_url)
+        img_url = "http:"+img_url
+        print("doloadUrl:", img_url,title)
         img = requests.get(img_url, headers=headers)
         array = img_url.split('/')
         file_name = array[len(array) - 1]
-        f = open(save_path+file_name, 'ab')
+        self.createFile(save_path+title)
+        f = open(save_path+title+"\\"+file_name, 'ab')
         f.write(img.content)
-        print(img_title, '图片保存成功！')
+        print(title, '图片保存成功！')
         f.close()
 
     def startdownload(self):
         print("下载漂亮小姐姐开始了....")
-        ip_list = self.load_ip()
         # 创建文件夹
         self.createFile(save_path)
-        start_url = 'http://www.tpxl.com/xgmn/{}.html'
-        urls = [start_url.format(page) for page in range(1, 171)]
-        for url in urls:
-            print("url:" + url)
-            self.main(url, ip_list);
+        for num in range(1000, 1427):
+            start_url = 'http://www.tpxl.com/xgmn/' + str(num) + '.html'
+            try:
+                print("url:" + start_url)
+                self.main(start_url,num);
+            except:
+                print("url:" + start_url+"地址不对")
         print("下载漂亮小姐姐结束了....")
 
 if __name__ == '__main__':
