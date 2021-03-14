@@ -52,7 +52,6 @@ class PictureSpider(object):
     def main(self,url,num):
         request = requests.get(url,headers=headers)
         request.encoding = 'utf-8'
-        print("网页内容："+request.text)
         soup_sub = BeautifulSoup(request.text, 'html.parser')
         title = soup_sub.h1.string
         # 调用后台接口获取图片地址
@@ -63,7 +62,6 @@ class PictureSpider(object):
         replace = 'success_jsonpCallback'+str(num)+'('
         data = download_request.text.replace(replace,'').replace(')','')
         url_list = json.loads(data)
-        print("-----------------------------------------")
         for item in url_list:
             url = str(item['url'])
             print(url)
@@ -71,7 +69,6 @@ class PictureSpider(object):
     def download(self,img_url,title):
         print('开始保存图片', title,img_url)
         img_url = "http:"+img_url
-        print("doloadUrl:", img_url,title)
         img = requests.get(img_url, headers=headers)
         array = img_url.split('/')
         file_name = array[len(array) - 1]
@@ -85,7 +82,7 @@ class PictureSpider(object):
         print("下载漂亮小姐姐开始了....")
         # 创建文件夹
         self.createFile(save_path)
-        for num in range(1000, 1427):
+        for num in range(1343, 1427):
             start_url = 'http://www.tpxl.com/xgmn/' + str(num) + '.html'
             try:
                 print("url:" + start_url)
