@@ -3,7 +3,6 @@
 import time
 import requests, re, random, os
 from bs4 import BeautifulSoup
-from MysqlClient import MysqlClient
 import json
 
 class PictureSpider(object):
@@ -67,8 +66,8 @@ class PictureSpider(object):
             print(url)
             self.download(url,title);
     def download(self,img_url,title):
-        print('开始保存图片', title,img_url)
         img_url = "http:"+img_url
+        print('开始保存图片', title, img_url)
         img = requests.get(img_url, headers=headers)
         array = img_url.split('/')
         file_name = array[len(array) - 1]
@@ -82,7 +81,7 @@ class PictureSpider(object):
         print("下载漂亮小姐姐开始了....")
         # 创建文件夹
         self.createFile(save_path)
-        for num in range(1343, 1427):
+        for num in range(2, 2000):
             start_url = 'http://www.tpxl.com/xgmn/' + str(num) + '.html'
             try:
                 print("url:" + start_url)
