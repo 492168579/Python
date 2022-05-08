@@ -40,7 +40,7 @@ class PictureSpider(object):
                }
     # 定义存储位置
     global save_path
-    save_path = 'D:\BeautifulPictures1\\'
+    save_path = 'D:\\beautiful\mxxz\\'
 
     # 创建文件夹
     def createFile(self,file_path):
@@ -81,8 +81,8 @@ class PictureSpider(object):
         print("下载漂亮小姐姐开始了....")
         # 创建文件夹
         self.createFile(save_path)
-        for num in range(2, 2000):
-            start_url = 'http://www.tpxl.com/xgmn/' + str(num) + '.html'
+        for num in range(2, 1428):
+            start_url = 'http://www.tpxl.com/mxxz/' + str(num) + '.html'
             try:
                 print("url:" + start_url)
                 self.main(start_url,num);
